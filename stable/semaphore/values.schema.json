@@ -188,6 +188,52 @@
           "description": "Path where the combined CA bundle is mounted"
         }
       }
+    },
+    "extraObjects": {
+      "type": "array",
+      "description": "List of extra Kubernetes objects to deploy with the chart. Each object should be a complete Kubernetes resource manifest.",
+      "items": {
+        "type": "object"
+      },
+      "default": []
+    },
+    "ingress": {
+      "type": "object",
+      "properties": {
+        "tlsCertificate": {
+          "type": "object",
+          "description": "TLS certificate configuration for ingress",
+          "properties": {
+            "create": {
+              "type": "boolean",
+              "description": "Create TLS secret from certificate and key",
+              "default": false
+            },
+            "secretName": {
+              "type": ["string", "null"],
+              "description": "Name of the TLS secret to create"
+            },
+            "certificate": {
+              "type": ["string", "null"],
+              "description": "TLS certificate in PEM format"
+            },
+            "certificateKey": {
+              "type": "string",
+              "description": "Key used within secret for certificate",
+              "default": "tls.crt"
+            },
+            "privateKey": {
+              "type": ["string", "null"],
+              "description": "TLS private key in PEM format"
+            },
+            "privateKeyKey": {
+              "type": "string",
+              "description": "Key used within secret for private key",
+              "default": "tls.key"
+            }
+          }
+        }
+      }
     }
   }
 }

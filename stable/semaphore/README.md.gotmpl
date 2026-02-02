@@ -132,6 +132,92 @@ oidc:
       email_claim: email
 ```
 
+### TLS Certificate for Ingress
+
+The chart supports multiple ways to configure TLS certificates for ingress:
+
+**Option 1: Provide certificate and key directly (creates a secret):**
+
+```yaml
+ingress:
+  enabled: true
+  hosts:
+    - host: semaphore.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tlsCertificate:
+    create: true
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
+    privateKey: |
+      -----BEGIN PRIVATE KEY-----
+      ...
+      -----END PRIVATE KEY-----
+```
+
+**Option 2: Use manual TLS configuration with existing secrets:**
+
+```yaml
+ingress:
+  enabled: true
+  hosts:
+    - host: semaphore.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: custom-tls-secret
+      hosts:
+        - semaphore.example.com
+```
+
+### Extra Objects
+
+The chart supports deploying additional Kubernetes resources alongside the main application through the `extraObjects` field:
+
+```yaml
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: my-custom-config
+    data:
+      custom-key: custom-value
+  
+  - apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      name: cleanup-job
+    spec:
+      schedule: "0 2 * * *"
+      jobTemplate:
+        spec:
+          template:
+            spec:
+              containers:
+              - name: cleanup
+                image: busybox
+                command: ["sh", "-c", "echo Cleanup"]
+              restartPolicy: OnFailure
+```
+
+All objects support templating using Helm template functions. You can reference chart values, release information, and use helper templates:
+
+```yaml
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: "{{ include \"semaphoreui.fullname\" . }}-custom"
+      labels:
+        {{- include "semaphoreui.labels" . | nindent 4 }}
+    data:
+      app-name: "{{ .Release.Name }}"
+```
+
 {{ template "chart.maintainersSection" . }}
 
 {{ template "chart.sourcesSection" . }}

@@ -112,6 +112,29 @@ ingress:
 
   # -- Optional TLS configuration for ingress
   tls: []
+  #   - secretName: tls-secret
+  #     hosts:
+  #       - example.local
+
+  # -- TLS certificate and key for ingress (creates a secret)
+  tlsCertificate:
+    # -- Create TLS secret from certificate and key
+    create: false
+
+    # -- Name of the TLS secret to create
+    secretName: ""
+
+    # -- TLS certificate (PEM format)
+    certificate: ""
+
+    # -- Key used within secret for certificate
+    certificateKey: tls.crt
+
+    # -- TLS private key (PEM format)
+    privateKey: ""
+
+    # -- Key used within secret for private key
+    privateKeyKey: tls.key
 
   # -- Additional annotations for the ingress
   annotations: {}
@@ -496,4 +519,20 @@ postgresql:
     serviceMonitor:
       # -- Enable service monitor for postgresql
       enabled: false
+
+# -- List of extra Kubernetes objects to deploy
+extraObjects: []
+  # - apiVersion: v1
+  #   kind: ConfigMap
+  #   metadata:
+  #     name: my-custom-config
+  #   data:
+  #     key: value
+  # - apiVersion: v1
+  #   kind: Secret
+  #   metadata:
+  #     name: my-custom-secret
+  #   type: Opaque
+  #   stringData:
+  #     token: my-token
 ...

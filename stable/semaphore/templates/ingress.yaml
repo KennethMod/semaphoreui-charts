@@ -20,8 +20,9 @@ spec:
   {{- if .Values.ingress.className }}
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
-  {{- if .Values.ingress.tls }}
+  {{- if or .Values.ingress.tls (and .Values.ingress.tlsCertificate.create .Values.ingress.tlsCertificate.certificate .Values.ingress.tlsCertificate.privateKey) }}
   tls:
+    {{- if .Values.ingress.tls }}
     {{- range .Values.ingress.tls }}
     - secretName: {{ .secretName }}
       {{- if .hosts }}
@@ -30,6 +31,13 @@ spec:
         - {{ . | quote }}
         {{- end }}
       {{- end }}
+    {{- end }}
+    {{- else if and .Values.ingress.tlsCertificate.create .Values.ingress.tlsCertificate.certificate .Values.ingress.tlsCertificate.privateKey }}
+    - secretName: {{ .Values.ingress.tlsCertificate.secretName | default (printf "%s-tls" (include "semaphoreui.fullname" .)) }}
+      hosts:
+        {{- range .Values.ingress.hosts }}
+        - {{ .host | quote }}
+        {{- end }}
     {{- end }}
   {{- end }}
   rules:
